@@ -1,13 +1,13 @@
 # network_to_file_image
 
-This is a mixture of [FileImage] and [NetworkImage].
+This is a mixture of `FileImage` and `NetworkImage`.
 It will download the image from the url once, save it locally in the file system,
 and then use it from there in the future.
 
-In more detail:
+**In more detail:**
  
 Given a file and url of an image, it first tries to read it from the local file.
-It decodes the given [File] object as an image, associating it with the given scale.
+It decodes the given `File` object as an image, associating it with the given scale.
 
 However, if the image doesn't yet exist as a local file, it fetches the given URL
 from the network, associating it with the given scale, and then saves it to the local file.
@@ -15,12 +15,12 @@ The image will be cached regardless of cache headers from the server.
 
 Notes:
 
- - If the provided url is null or empty, [NetworkToFileImage] will default
- to [FileImage]. It will read the image from the local file, and won't try to
+ - If the provided url is null or empty, `NetworkToFileImage` will default
+ to `FileImage`. It will read the image from the local file, and won't try to
  download it from the network.
 
- - If the provided file is null, [NetworkToFileImage] will default
- to [NetworkImage]. It will download the image from the network, and won't
+ - If the provided file is null, `NetworkToFileImage` will default
+ to `NetworkImage`. It will download the image from the network, and won't
  save it locally.
 
 ## Usage
@@ -53,7 +53,7 @@ Then, create the image:
 
     Image(image: NetworkToFileImage(url: "http://example.com/someFile.png", file: myFile))
 
-If you make debug=true it prints to the console whether the image was read from 
+If you make `debug: true` it prints to the console whether the image was read from 
 the file or fetched from the network:
 
     Image(image: NetworkToFileImage(url: "http://example.com/someFile.png", file: myFile, debug: true))    
@@ -70,10 +70,26 @@ You can set mock files. Please see methods:
 * `clearMockFiles()`
 * `clearMockUrls()`
 
-
 ## See also
 
-  * flutter_image: https://pub.dartlang.org/packages/flutter_image
-  * image_downloader: https://pub.dartlang.org/packages/image_downloader
-  * cached_network_image: https://pub.dartlang.org/packages/cached_network_image
-  * flutter_advanced_networkimage: https://pub.dartlang.org/packages/flutter_advanced_networkimage
+  * <a href="https://pub.dev/packages/flutter_image">flutter_image</a>
+  * <a href="https://pub.dev/packages/image_downloader">image_downloader</a>
+  * <a href="https://pub.dev/packages/cached_network_image">cached_network_image</a>
+  * <a href="https://pub.dev/packages/flutter_advanced_networkimage">flutter_advanced_networkimage</a>  
+  * <a href="https://pub.dev/packages/https://pub.dev/packages/extended_image">extended_image</a>  
+
+***
+
+*The Flutter packages I've authored:* 
+* <a href="https://pub.dev/packages/async_redux">async_redux</a>
+* <a href="https://pub.dev/packages/align_positioned">align_positioned</a>
+* <a href="https://pub.dev/packages/network_to_file_image">network_to_file_image</a>
+* <a href="https://pub.dev/packages/matrix4_transform">matrix4_transform</a> 
+* <a href="https://pub.dev/packages/back_button_interceptor">back_button_interceptor</a>
+* <a href="https://pub.dev/packages/indexed_list_view">indexed_list_view</a> 
+* <a href="https://pub.dev/packages/animated_size_and_fade">animated_size_and_fade</a>
+
+---<br>_https://github.com/marcglasberg_<br>
+_https://twitter.com/glasbergmarcelo_<br>
+_https://stackoverflow.com/users/3411681/marcg_<br>
+_https://medium.com/@marcglasberg_<br>

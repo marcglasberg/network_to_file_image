@@ -105,13 +105,15 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   @override
   ImageStreamCompleter load(NetworkToFileImage key) {
     return MultiFrameImageStreamCompleter(
-        codec: _loadAsync(key),
-        scale: key.scale,
-        informationCollector: (StringBuffer information) {
-          information.writeln('Image provider: $this');
-          information.writeln('File: ${file?.path}');
-          information.writeln('Url: $url');
-        });
+      codec: _loadAsync(key),
+      scale: key.scale,
+      // Only from Flutter versions 1.6.0 up, we can use this:
+      //    informationCollector: () sync* {
+      //      yield ErrorDescription('Image provider: $this');
+      //      yield ErrorDescription('File: ${file?.path}');
+      //      yield ErrorDescription('Url: $url');
+      //      }
+    );
   }
 
   Future<ui.Codec> _loadAsync(NetworkToFileImage key) async {
@@ -169,10 +171,13 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
     });
     final HttpClientResponse response = await request.close();
     if (response.statusCode != HttpStatus.ok)
-      throw Exception('HTTP request failed, statusCode: ${response?.statusCode}, $resolved');
+      throw Exception('HTTP request failed, '
+          'statusCode: ${response?.statusCode}, $resolved');
 
     final Uint8List bytes = await consolidateHttpClientResponseBytes(response);
-    if (bytes.lengthInBytes == 0) throw Exception('NetworkImage is an empty file: $resolved');
+    if (bytes.lengthInBytes == 0) {
+      throw Exception('NetworkImage is an empty file: $resolved');
+    }
 
     if (file != null) saveImageToTheLocalFile(bytes);
 
@@ -186,7 +191,9 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
 
     final Uri resolved = Uri.base.resolve(url);
     Uint8List bytes = _mockUrls[url];
-    if (bytes.lengthInBytes == 0) throw Exception('NetworkImage is an empty file: $resolved');
+    if (bytes.lengthInBytes == 0) {
+      throw Exception('NetworkImage is an empty file: $resolved');
+    }
     if (file != null) saveImageToTheLocalFile(bytes);
     return bytes;
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -34,16 +35,11 @@ class Demo extends StatelessWidget {
   const Demo({Key key, this.url, this.file}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    //
-    return Scaffold(
-      appBar: AppBar(title: const Text('Network to file image example')),
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Image(
-          image: NetworkToFileImage(url: url, file: file, debug: true),
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text('Network to file image example')),
+        body: Padding(
+          padding: const EdgeInsets.all(30.0),
+          child: Image(image: NetworkToFileImage(url: url, file: file, debug: true)),
         ),
-      ),
-    );
-  }
+      );
 }
