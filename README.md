@@ -1,3 +1,5 @@
+[![pub package](https://img.shields.io/pub/v/network_to_file_image.svg)](https://pub.dartlang.org/packages/network_to_file_image)
+
 # network_to_file_image
 
 This is a mixture of `FileImage` and `NetworkImage`.
@@ -89,7 +91,7 @@ You can set mock files. Please see methods:
 * <a href="https://pub.dev/packages/indexed_list_view">indexed_list_view</a> 
 * <a href="https://pub.dev/packages/animated_size_and_fade">animated_size_and_fade</a>
 
----<br>_https://github.com/marcglasberg_<br>
+---<br>_Marcelo Glasberg:_<br>_https://github.com/marcglasberg_<br>
 _https://twitter.com/glasbergmarcelo_<br>
 _https://stackoverflow.com/users/3411681/marcg_<br>
 _https://medium.com/@marcglasberg_<br>
