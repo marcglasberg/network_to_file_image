@@ -44,6 +44,10 @@
 
 * Docs improvement. 
   
+## [2.0.7] - 2019/09/12
+
+* ErrorDescription. 
+  
 
 
 

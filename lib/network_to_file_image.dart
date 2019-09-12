@@ -105,15 +105,13 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   @override
   ImageStreamCompleter load(NetworkToFileImage key) {
     return MultiFrameImageStreamCompleter(
-      codec: _loadAsync(key),
-      scale: key.scale,
-      // Only from Flutter versions 1.6.0 up, we can use this:
-      //    informationCollector: () sync* {
-      //      yield ErrorDescription('Image provider: $this');
-      //      yield ErrorDescription('File: ${file?.path}');
-      //      yield ErrorDescription('Url: $url');
-      //      }
-    );
+        codec: _loadAsync(key),
+        scale: key.scale,
+        informationCollector: () sync* {
+          yield ErrorDescription('Image provider: $this');
+          yield ErrorDescription('File: ${file?.path}');
+          yield ErrorDescription('Url: $url');
+        });
   }
 
   Future<ui.Codec> _loadAsync(NetworkToFileImage key) async {
