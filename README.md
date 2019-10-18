@@ -78,7 +78,7 @@ You can set mock files. Please see methods:
   * <a href="https://pub.dev/packages/image_downloader">image_downloader</a>
   * <a href="https://pub.dev/packages/cached_network_image">cached_network_image</a>
   * <a href="https://pub.dev/packages/flutter_advanced_networkimage">flutter_advanced_networkimage</a>  
-  * <a href="https://pub.dev/packages/https://pub.dev/packages/extended_image">extended_image</a>  
+  * <a href="https://pub.dev/packages/extended_image">extended_image</a>  
 
 ***
 
