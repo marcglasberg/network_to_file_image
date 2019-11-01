@@ -21,7 +21,7 @@ import 'package:flutter/painting.dart';
 ///        imageProviderSupplier: (User user) =>
 ///           NetworkToFileImage(file: user.file, url: user.url),
 ///        keySupplier: (User user) => user.filename,
-///        loadCallback: (image, key) => setState((){}),
+///        loadCallback: (image, obj, key) => setState((){}),
 ///      );
 ///
 /// // While the image is downloading, this will return null.
@@ -35,42 +35,37 @@ import 'package:flutter/painting.dart';
 class ImageForCanvas<T> {
   static final Map<Object, ui.Image> _images = {};
 
-  static Object _identity(obj) => obj;
-
   ImageForCanvas({
     @required this.imageProviderSupplier,
     @required this.loadCallback,
-    this.keySupplier = _identity,
-  })  : assert(imageProviderSupplier != null),
-        assert(keySupplier != null);
+    this.keySupplier,
+  }) : assert(imageProviderSupplier != null);
 
   final ImageProvider Function(T obj) imageProviderSupplier;
 
-  final void Function(ImageInfo image, T key) loadCallback;
+  final void Function(ImageInfo image, T obj, Object key) loadCallback;
 
   final Object Function(T obj) keySupplier;
 
   void clearInternalCache() => _images.clear();
 
   ui.Image image(T obj) {
-    var key = keySupplier(obj);
+    var key = (keySupplier == null) ? obj : keySupplier(obj);
     var image = _images[key];
 
     if (image == null) {
       if (!_images.containsKey(key)) {
         _images[key] = null;
 
-        ImageProvider imgProvider = imageProviderSupplier(key);
+        ImageProvider imgProvider = imageProviderSupplier(obj);
 
         final ImageStreamCompleter completer = PaintingBinding.instance.imageCache
             .putIfAbsent(imgProvider, () => imgProvider.load(imgProvider), onError: (_, __) {});
 
         ImageListener onImage = (ImageInfo image, bool synchronousCall) {
-          _onImage(image, key);
+          _onImage(image, obj, key);
         };
-
         ImageStreamListener listener = ImageStreamListener(onImage);
-
         completer.addListener(listener);
       }
     }
@@ -78,8 +73,8 @@ class ImageForCanvas<T> {
     return image;
   }
 
-  void _onImage(ImageInfo image, T key) {
+  void _onImage(ImageInfo image, T obj, Object key) {
     _images[key] = image.image;
-    if (loadCallback != null) loadCallback(image, key);
+    if (loadCallback != null) loadCallback(image, obj, key);
   }
 }

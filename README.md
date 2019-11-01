@@ -65,7 +65,7 @@ For example: Suppose a `User` object that contains `url` and `filename` properti
  var imageForCanvas = ImageForCanvas<User>(
         imageProviderSupplier: (User user) => NetworkToFileImage(file: user.file, url: user.url),
         keySupplier: (User user) => user.filename,
-        loadCallback: (image, key) => setState((){}),
+        loadCallback: (image, obj, key) => setState((){}),
       );
 
  // While the image is downloading, this will return null.
