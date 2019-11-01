@@ -17,10 +17,10 @@ import 'package:flutter/painting.dart';
 /// properties.
 ///
 /// ```
-/// var imageForCanvas = ImageForCanvas(
+/// var imageForCanvas = ImageForCanvas<User>(
 ///        imageProviderSupplier: (User user) =>
 ///           NetworkToFileImage(file: user.file, url: user.url),
-///        keySupplier: (User user) => usuario.filename,
+///        keySupplier: (User user) => user.filename,
 ///        loadCallback: (image, key) => setState((){}),
 ///      );
 ///
