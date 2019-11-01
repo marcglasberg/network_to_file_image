@@ -25,16 +25,6 @@ Notes:
  to `NetworkImage`. It will download the image from the network, and won't
  save it locally.
 
-## Usage
-
-### Import the package
-
-First, add network_to_file_image [as a dependency](https://pub.dartlang.org/packages/network_to_file_image#-installing-tab-) in your pubspec.yaml
-
-Then, import it:
-
-    import 'package:network_to_file_image/network_to_file_image.dart';
-
 ### Use the package
 
 If you also listed `path_provider` in your pubspec.yaml file:
@@ -62,6 +52,34 @@ the file or fetched from the network:
 
 Don't forget to check the [example tab](https://pub.dartlang.org/packages/network_to_file_image#-example-tab-).
 
+## Canvas
+
+You can also load images to use with the `Canvas` object of the `paint` method of a `CustomPainter`. 
+
+ImageProviders can't be used directly with the `Canvas` object, 
+but you can use the provided `ImageForCanvas` class.
+ 
+For example: Suppose a `User` object that contains `url` and `filename` properties:
+
+ ```dart
+ var imageForCanvas = ImageForCanvas(
+        imageProviderSupplier: (User user) => NetworkToFileImage(file: user.file, url: user.url),
+        keySupplier: (User user) => usuario.filename,
+        loadCallback: (image, key) => setState((){}),
+      );
+
+ // While the image is downloading, this will return null.
+ var myImage = imageForCanvas.image(user);
+
+ if (myImage != null) {
+    canvas.drawImage(myImage, ...);
+    }
+ ```
+
+It will use the regular image cache from Flutter, and works not only with `NetworkToFileImage` provider, 
+but any other image providers.
+
+
 ## Tests
 
 You can set mock files. Please see methods:
@@ -84,6 +102,8 @@ You can set mock files. Please see methods:
 
 *The Flutter packages I've authored:* 
 * <a href="https://pub.dev/packages/async_redux">async_redux</a>
+* <a href="https://pub.dev/packages/provider_for_redux">provider_for_redux</a>
+* <a href="https://pub.dev/packages/i18_extension">i18_extension</a>
 * <a href="https://pub.dev/packages/align_positioned">align_positioned</a>
 * <a href="https://pub.dev/packages/network_to_file_image">network_to_file_image</a>
 * <a href="https://pub.dev/packages/matrix4_transform">matrix4_transform</a> 
