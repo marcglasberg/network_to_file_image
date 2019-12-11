@@ -1,9 +1,10 @@
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
-/// Use this `ImageForCanvas` class if you want to creates images to use with
+/// Use this `ImageForCanvas` class if you want to create images to use with
 /// Canvas. It will use the regular image cache from Flutter, and works with
 /// NetworkToFileImage provider, or any other image providers.
 ///
@@ -59,8 +60,12 @@ class ImageForCanvas<T> {
 
         ImageProvider imgProvider = imageProviderSupplier(obj);
 
-        final ImageStreamCompleter completer = PaintingBinding.instance.imageCache
-            .putIfAbsent(imgProvider, () => imgProvider.load(imgProvider), onError: (_, __) {});
+        var decoder = (Uint8List bytes, {int cacheWidth, int cacheHeight}) =>
+            PaintingBinding.instance.instantiateImageCodec(bytes);
+
+        final ImageStreamCompleter completer = PaintingBinding.instance.imageCache.putIfAbsent(
+            imgProvider, () => imgProvider.load(imgProvider, decoder),
+            onError: (_, __) {});
 
         ImageListener onImage = (ImageInfo image, bool synchronousCall) {
           _onImage(image, obj, key);

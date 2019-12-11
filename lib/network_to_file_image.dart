@@ -103,9 +103,15 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   }
 
   @override
-  ImageStreamCompleter load(NetworkToFileImage key) {
+  ImageStreamCompleter load(NetworkToFileImage key, DecoderCallback decode) {
+    // Ownership of this controller is handed off to [_loadAsync]; it is that
+    // method's responsibility to close the controller's stream when the image
+    // has been loaded or an error is thrown.
+    final StreamController<ImageChunkEvent> chunkEvents = StreamController<ImageChunkEvent>();
+
     return MultiFrameImageStreamCompleter(
-        codec: _loadAsync(key),
+        codec: _loadAsync(key, chunkEvents, decode),
+        chunkEvents: chunkEvents.stream,
         scale: key.scale,
         informationCollector: () sync* {
           yield ErrorDescription('Image provider: $this');
@@ -114,50 +120,64 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
         });
   }
 
-  Future<ui.Codec> _loadAsync(NetworkToFileImage key) async {
-    assert(key == this);
-    // ---
+  Future<ui.Codec> _loadAsync(
+    NetworkToFileImage key,
+    StreamController<ImageChunkEvent> chunkEvents,
+    DecoderCallback decode,
+  ) async {
+    try {
+      assert(key == this);
+      // ---
 
-    Uint8List bytes;
+      Uint8List bytes;
 
-    // Reads a MOCK file.
-    if (file != null && _mockFiles.containsKey(file.path)) {
-      bytes = _mockFiles[file.path];
+      // Reads a MOCK file.
+      if (file != null && _mockFiles.containsKey(file.path)) {
+        bytes = _mockFiles[file.path];
+      }
+
+      // Reads from the local file.
+      else if (file != null && _ifFileExistsLocally()) {
+        bytes = await _readFromTheLocalFile();
+      }
+
+      // Reads from the MOCK network and saves it to the local file.
+      else if (url != null && url.isNotEmpty && _mockUrls.containsKey(url)) {
+        bytes = await _downloadFromTheMockNetworkAndSaveToTheLocalFile();
+      }
+
+      // Reads from the network and saves it to the local file.
+      else if (url != null && url.isNotEmpty) {
+        bytes = await _downloadFromTheNetworkAndSaveToTheLocalFile(chunkEvents);
+      }
+
+      // ---
+
+      // Empty file.
+      if ((bytes != null) && (bytes.lengthInBytes == 0)) bytes = null;
+
+      return await decode(bytes);
+    } finally {
+      chunkEvents.close();
     }
-
-    // Reads from the local file.
-    else if (file != null && _ifFileExistsLocally()) {
-      bytes = await _readFromTheLocalFile();
-    }
-
-    // Reads from the MOCK network and saves it to the local file.
-    else if (url != null && url.isNotEmpty && _mockUrls.containsKey(url)) {
-      bytes = await _downloadFromTheMockNetworkAndSaveToTheLocalFile();
-    }
-
-    // Reads from the network and saves it to the local file.
-    else if (url != null && url.isNotEmpty) {
-      bytes = await _downloadFromTheNetworkAndSaveToTheLocalFile();
-    }
-
-    // ---
-
-    // Empty file.
-    if ((bytes != null) && (bytes.lengthInBytes == 0)) bytes = null;
-
-    return await PaintingBinding.instance.instantiateImageCodec(bytes);
   }
 
   bool _ifFileExistsLocally() => file.existsSync();
 
   Future<Uint8List> _readFromTheLocalFile() async {
     if (debug) print("Reading image file: ${file?.path}");
-    return await file.readAsBytes();
+
+    final Uint8List bytes = await file.readAsBytes();
+    if (bytes.lengthInBytes == 0) return null;
+
+    return bytes;
   }
 
   static final HttpClient _httpClient = HttpClient();
 
-  Future<Uint8List> _downloadFromTheNetworkAndSaveToTheLocalFile() async {
+  Future<Uint8List> _downloadFromTheNetworkAndSaveToTheLocalFile(
+    StreamController<ImageChunkEvent> chunkEvents,
+  ) async {
     assert(url != null && url.isNotEmpty);
     if (debug) print("Fetching image from: $url");
     // ---
@@ -169,10 +189,17 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
     });
     final HttpClientResponse response = await request.close();
     if (response.statusCode != HttpStatus.ok)
-      throw Exception('HTTP request failed, '
-          'statusCode: ${response?.statusCode}, $resolved');
+      throw NetworkImageLoadException(statusCode: response.statusCode, uri: resolved);
 
-    final Uint8List bytes = await consolidateHttpClientResponseBytes(response);
+    final Uint8List bytes = await consolidateHttpClientResponseBytes(
+      response,
+      onBytesReceived: (int cumulative, int total) {
+        chunkEvents.add(ImageChunkEvent(
+          cumulativeBytesLoaded: cumulative,
+          expectedTotalBytes: total,
+        ));
+      },
+    );
     if (bytes.lengthInBytes == 0) {
       throw Exception('NetworkImage is an empty file: $resolved');
     }
@@ -202,7 +229,7 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     if (other.runtimeType != runtimeType) return false;
     final NetworkToFileImage typedOther = other;
     return url == typedOther.url &&
