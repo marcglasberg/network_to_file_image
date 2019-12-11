@@ -1,6 +1,6 @@
-## [2.2.0] - 2019/12/11
+## [2.2.1] - 2019/12/11
 
-* Upgraded: Dart 2.7. 
+* yUpgraded: Dart 2.7 (as per https://github.com/flutter/flutter/pull/41415). 
   
 ## [2.1.5] - 2019/10/31
 

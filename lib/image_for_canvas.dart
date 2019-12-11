@@ -60,8 +60,9 @@ class ImageForCanvas<T> {
 
         ImageProvider imgProvider = imageProviderSupplier(obj);
 
-        var decoder = (Uint8List bytes, {int cacheWidth, int cacheHeight}) =>
-            PaintingBinding.instance.instantiateImageCodec(bytes);
+        var decoder = (Uint8List bytes, {int cacheWidth, int cacheHeight}) => PaintingBinding
+            .instance
+            .instantiateImageCodec(bytes, cacheWidth: cacheWidth, cacheHeight: cacheHeight);
 
         final ImageStreamCompleter completer = PaintingBinding.instance.imageCache.putIfAbsent(
             imgProvider, () => imgProvider.load(imgProvider, decoder),

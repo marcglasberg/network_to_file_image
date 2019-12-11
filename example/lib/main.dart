@@ -23,6 +23,7 @@ void main() async {
 }
 
 Future<File> file(String filename) async {
+  WidgetsFlutterBinding.ensureInitialized();
   Directory dir = await getApplicationDocumentsDirectory();
   String pathName = p.join(dir.path, filename);
   return File(pathName);

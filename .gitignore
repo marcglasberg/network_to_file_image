@@ -11,4 +11,6 @@ ios/Runner/GeneratedPluginRegistrant.*
 
 .idea/
 *.iml
+*.lock
 pubspec.lock
+.flutter-plugins-dependencies
