@@ -365,7 +365,20 @@ class _MockHttpClient implements HttpClient {
       _realClient.open(method, host, port, path);
 
   @override
-  Future<HttpClientRequest> openUrl(String method, Uri url) => _realClient.openUrl(method, url);
+  Future<HttpClientRequest> openUrl(String method, Uri url) async {
+    if (method == "GET") {
+      String urlStr = url?.toString();
+
+      if (urlStr != null && urlStr.isNotEmpty && NetworkToFileImage._mockUrls.containsKey(urlStr)) {
+        return _MockHttpClientRequest(NetworkToFileImage._mockUrls[urlStr]);
+      }
+
+      return _realClient.openUrl(method, url);
+    } else
+      return _realClient.openUrl(method, url);
+  }
+
+//  => _realClient.openUrl(method, url);
 
   @override
   Future<HttpClientRequest> patch(String host, int port, String path) =>

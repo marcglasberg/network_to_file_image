@@ -1,4 +1,4 @@
-## [2.2.3] - 2019/12/21
+## [2.2.4] - 2019/12/21
 
 * Http override (mock urls visible to the whole app). 
 

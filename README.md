@@ -91,8 +91,8 @@ You can set mock files (local and in the network). Please see methods:
 * `clearMockUrls()`
 
 Your mocked urls are usually only seen by the `NetworkToFileImage` class.
-However, you may override the default Dart http methods so that these urls are visible to 
-the rest of your application, including all other ImageProviders. 
+However, you may override the default Dart http methods 
+so that these urls are visible to other ImageProviders. 
 
 To that end, simply call this method:
 
@@ -104,8 +104,7 @@ You can stop the http override by calling:
 
 ```dart
 NetworkToFileImage.stopHttpOverride();
-```                                                             
-
+```                                                            
 
 
 ## See also
