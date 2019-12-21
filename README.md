@@ -29,7 +29,7 @@ Notes:
 
 If you also listed `path_provider` in your pubspec.yaml file:
 
-    path_provider: ^0.4.1
+    path_provider: ^1.4.4
 
 Then you can create a file from a file name:
 
@@ -82,13 +82,31 @@ but any other image providers.
 
 ## Tests
 
-You can set mock files. Please see methods:
+You can set mock files (local and in the network). Please see methods:
 
 * `setMockFile(File file, Uint8List bytes)`
 * `setMockUrl(String url, Uint8List bytes)`
 * `clearMocks()`
 * `clearMockFiles()`
 * `clearMockUrls()`
+
+Your mocked urls are usually only seen by the `NetworkToFileImage` class.
+However, you may override the default Dart http methods so that these urls are visible to 
+the rest of your application, including all other ImageProviders. 
+
+To that end, simply call this method:
+
+```dart
+NetworkToFileImage.startHttpOverride();
+```                                                             
+
+You can stop the http override by calling: 
+
+```dart
+NetworkToFileImage.stopHttpOverride();
+```                                                             
+
+
 
 ## See also
 
@@ -99,6 +117,8 @@ You can set mock files. Please see methods:
   * <a href="https://pub.dev/packages/extended_image">extended_image</a>  
 
 ***
+
+*Special Thanks: <a href="https://github.com/hugocbpassos">Hugo Passos</a> helped me with the http override.*
 
 *The Flutter packages I've authored:* 
 * <a href="https://pub.dev/packages/async_redux">async_redux</a>

@@ -1,6 +1,10 @@
+## [2.2.2] - 2019/12/21
+
+* Http override (mock urls visible to the whole app). 
+
 ## [2.2.1] - 2019/12/11
 
-* yUpgraded: Dart 2.7 (as per https://github.com/flutter/flutter/pull/41415). 
+* Upgraded: Dart 2.7 (as per https://github.com/flutter/flutter/pull/41415). 
   
 ## [2.1.5] - 2019/10/31
 
