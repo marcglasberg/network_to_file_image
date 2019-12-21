@@ -455,8 +455,6 @@ class _MockHttpClientRequest extends HttpClientRequest {
 
 class _MockHttpClientResponse implements HttpClientResponse {
   //
-  static var count = 0;
-
   final Stream<Uint8List> _delegate;
   final int _contentLength;
 
@@ -495,7 +493,6 @@ class _MockHttpClientResponse implements HttpClientResponse {
   @override
   StreamSubscription<Uint8List> listen(void Function(Uint8List event) onData,
       {Function onError, void Function() onDone, bool cancelOnError}) {
-    print('listening: ${count++}');
     return _delegate.listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }
 

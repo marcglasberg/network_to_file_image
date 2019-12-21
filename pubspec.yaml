@@ -1,6 +1,6 @@
 name: network_to_file_image
 description: Opens a local image file, if it exists there. If it doesn't, fetches the image from the network and then saves to the local file for next time.
-version: 2.2.2
+version: 2.2.3
 author: Marcelo Glasberg <marcglasberg@gmail.com>
 homepage: https://github.com/marcglasberg/network_to_file_image
 
