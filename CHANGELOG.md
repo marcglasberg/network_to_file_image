@@ -1,6 +1,7 @@
-## [2.2.5] - 2020/02/26
+## [2.2.7] - 2020/02/26
 
 * Docs improvement.
+* Better example (appDocsDir is read only once, during app initialization).
  
 ## [2.2.4] - 2019/12/21
 
