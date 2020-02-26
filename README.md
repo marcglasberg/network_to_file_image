@@ -111,9 +111,16 @@ NetworkToFileImage.stopHttpOverride();
 
   * <a href="https://pub.dev/packages/flutter_image">flutter_image</a>
   * <a href="https://pub.dev/packages/image_downloader">image_downloader</a>
-  * <a href="https://pub.dev/packages/cached_network_image">cached_network_image</a>
   * <a href="https://pub.dev/packages/flutter_advanced_networkimage">flutter_advanced_networkimage</a>  
-  * <a href="https://pub.dev/packages/extended_image">extended_image</a>  
+  * <a href="https://pub.dev/packages/extended_image">extended_image</a>
+  * <a href="https://pub.dev/packages/cached_network_image">cached_network_image</a>: 
+  Note `cached_network_image` will cache an image for some time, 
+  and then evict the image from the cache when the cache gets full, or according to other conditions. 
+  Meanwhile, `network_to_file_image` will simply download the image and leave it there. 
+  Think WhatsApp or Telegram: someone sends you an image, it's downloaded and kept there  
+  in your Gallery/files forever, or until someone deletes it manually. 
+  Also, `network_to_file_image` is much lighter than `cached_network_image`, 
+  which uses SQLite under the hood.  
 
 ***
 

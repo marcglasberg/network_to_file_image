@@ -1,3 +1,7 @@
+## [2.2.5] - 2020/02/26
+
+* Docs improvement.
+ 
 ## [2.2.4] - 2019/12/21
 
 * Http override (mock urls visible to the whole app). 
