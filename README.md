@@ -43,12 +43,19 @@ Then you can create a file from a file name:
 
 Then, create the image:
 
-    Image(image: NetworkToFileImage(url: "http://example.com/someFile.png", file: myFile))
+    Image(image: 
+            NetworkToFileImage(
+              url: "http://example.com/someFile.png", 
+              file: myFile))
 
 If you make `debug: true` it prints to the console whether the image was read from 
 the file or fetched from the network:
 
-    Image(image: NetworkToFileImage(url: "http://example.com/someFile.png", file: myFile, debug: true))    
+    Image(image: 
+            NetworkToFileImage(
+              url: "http://example.com/someFile.png", 
+              file: myFile, 
+              debug: true))    
 
 Don't forget to check the [example tab](https://pub.dartlang.org/packages/network_to_file_image#-example-tab-).
 
