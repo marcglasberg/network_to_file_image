@@ -1,3 +1,7 @@
+## [2.3.0] - 2020/05/06
+
+* Upgraded to Flutter 1.17.
+
 ## [2.2.8] - 2020/02/26
 
 * Docs improvement.
