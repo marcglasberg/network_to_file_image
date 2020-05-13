@@ -65,7 +65,9 @@ class ImageForCanvas<T> {
             .instantiateImageCodec(bytes, cacheWidth: cacheWidth, cacheHeight: cacheHeight);
 
         final ImageStreamCompleter completer = PaintingBinding.instance.imageCache.putIfAbsent(
-            imgProvider, () => imgProvider.load(imgProvider, decoder),
+            // ignore: invalid_use_of_protected_member
+            imgProvider,
+            () => imgProvider.load(imgProvider, decoder),
             onError: (_, __) {});
 
         ImageListener onImage = (ImageInfo image, bool synchronousCall) {
