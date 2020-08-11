@@ -57,7 +57,8 @@ the file or fetched from the network:
               file: myFile, 
               debug: true))    
 
-Don't forget to check the [example tab](https://pub.dartlang.org/packages/network_to_file_image#-example-tab-).
+Try running the <a href="https://github.com/marcglasberg/network_to_file_image/blob/master/example/lib/main.dart">NetworkToFileImage example</a>.
+
 
 ## Canvas
 
@@ -85,6 +86,8 @@ For example: Suppose a `User` object that contains `url` and `filename` properti
 
 It will use the regular image cache from Flutter, and works not only with `NetworkToFileImage` provider, 
 but any other image providers.
+
+Try running the <a href="https://github.com/marcglasberg/network_to_file_image/blob/master/example/lib/main_image_for_canvas.dart">ImageForCanvas example</a>.
 
 
 ## Tests

@@ -1,10 +1,15 @@
+## [2.3.2] - 2020/08/11
+
+* Upgrade: Flutter 1.20.
+* Example: main_image_for_canvas.dart
+  
 ## [2.3.1] - 2020/05/19
 
 * Docs improvement.
 
 ## [2.3.0] - 2020/05/06
 
-* Upgraded to Flutter 1.17.
+* Upgrade: Flutter 1.17.
 
 ## [2.2.8] - 2020/02/26
 
@@ -17,7 +22,7 @@
 
 ## [2.2.1] - 2019/12/11
 
-* Upgraded: Dart 2.7 (as per https://github.com/flutter/flutter/pull/41415). 
+* Upgrade: Dart 2.7 (as per https://github.com/flutter/flutter/pull/41415). 
   
 ## [2.1.5] - 2019/10/31
 

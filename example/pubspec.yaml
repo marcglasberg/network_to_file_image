@@ -6,7 +6,7 @@ environment:
   sdk: ">=2.8.0 <3.0.0"
 
 dependencies:
-  path_provider: ^1.4.4
+  path_provider: ^1.6.7
   network_to_file_image:
     path: ../
   flutter:

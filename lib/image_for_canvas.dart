@@ -1,9 +1,12 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
+typedef LoadCallback<T> = void Function(ImageInfo image, T obj, Object key);
+
+/// IMPORTANT: See example file: main_image_for_canvas.dart
+///
 /// Use this `ImageForCanvas` class if you want to create images to use with
 /// Canvas. It will use the regular image cache from Flutter, and works with
 /// NetworkToFileImage provider, or any other image providers.
@@ -44,7 +47,7 @@ class ImageForCanvas<T> {
 
   final ImageProvider Function(T obj) imageProviderSupplier;
 
-  final void Function(ImageInfo image, T obj, Object key) loadCallback;
+  final LoadCallback<T> loadCallback;
 
   final Object Function(T obj) keySupplier;
 
@@ -60,15 +63,19 @@ class ImageForCanvas<T> {
 
         ImageProvider imgProvider = imageProviderSupplier(obj);
 
-        var decoder = (Uint8List bytes, {int cacheWidth, int cacheHeight}) => PaintingBinding
-            .instance
-            .instantiateImageCodec(bytes, cacheWidth: cacheWidth, cacheHeight: cacheHeight);
+        var decoder = (Uint8List bytes, {bool allowUpscaling, int cacheWidth, int cacheHeight}) =>
+            PaintingBinding.instance
+                .instantiateImageCodec(bytes, cacheWidth: cacheWidth, cacheHeight: cacheHeight);
 
         final ImageStreamCompleter completer = PaintingBinding.instance.imageCache.putIfAbsent(
-            // ignore: invalid_use_of_protected_member
-            imgProvider,
-            () => imgProvider.load(imgProvider, decoder),
-            onError: (_, __) {});
+          // ignore: invalid_use_of_protected_member
+          imgProvider,
+          // ignore: invalid_use_of_protected_member
+          () => imgProvider.load(imgProvider, decoder),
+          onError: null,
+        );
+
+        assert(completer != null);
 
         ImageListener onImage = (ImageInfo image, bool synchronousCall) {
           _onImage(image, obj, key);

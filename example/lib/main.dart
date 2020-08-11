@@ -22,15 +22,16 @@ File fileFromDocsDir(String filename) {
 class Demo extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Network to file image example')),
+        appBar: AppBar(title: const Text('NetworkToFileImage example')),
         body: Padding(
           padding: const EdgeInsets.all(30.0),
           child: Image(
-              image: NetworkToFileImage(
-            url: "https://upload.wikimedia.org/wikipedia/commons/1/17/Google-flutter-logo.png",
-            file: fileFromDocsDir("flutter.png"),
-            debug: true,
-          )),
+            image: NetworkToFileImage(
+              url: "https://upload.wikimedia.org/wikipedia/commons/1/17/Google-flutter-logo.png",
+              file: fileFromDocsDir("flutter.png"),
+              debug: true,
+            ),
+          ),
         ),
       );
 }
