@@ -476,6 +476,9 @@ class _MockHttpClientResponse implements HttpClientResponse {
         _contentLength = bytes.length;
 
   @override
+  void abort([Object exception, StackTrace stackTrace]) {}
+
+  @override
   final HttpHeaders headers = _MockHttpHeaders();
 
   @override
