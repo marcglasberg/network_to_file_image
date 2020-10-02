@@ -375,13 +375,9 @@ class _MockHttpClient implements HttpClient {
       if (urlStr != null && urlStr.isNotEmpty && NetworkToFileImage._mockUrls.containsKey(urlStr)) {
         return _MockHttpClientRequest(NetworkToFileImage._mockUrls[urlStr]);
       }
-
-      return _realClient.openUrl(method, url);
-    } else
-      return _realClient.openUrl(method, url);
+    }
+    return _realClient.openUrl(method, url);
   }
-
-//  => _realClient.openUrl(method, url);
 
   @override
   Future<HttpClientRequest> patch(String host, int port, String path) =>
