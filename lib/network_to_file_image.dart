@@ -273,9 +273,6 @@ class _MockHttpClient implements HttpClient {
   _MockHttpClient(this._realClient);
 
   @override
-  void abort([Object exception, StackTrace stackTrace]) {}
-
-  @override
   bool get autoUncompress => _realClient.autoUncompress;
 
   @override
@@ -461,6 +458,9 @@ class _MockHttpClientRequest extends HttpClientRequest {
 
   @override
   void writeln([Object obj = '']) {}
+
+  @override
+  void abort([Object exception, StackTrace stackTrace]) {}
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -473,9 +473,6 @@ class _MockHttpClientResponse implements HttpClientResponse {
   _MockHttpClientResponse(Uint8List bytes)
       : _delegate = Stream<Uint8List>.value(bytes),
         _contentLength = bytes.length;
-
-  @override
-  void abort([Object exception, StackTrace stackTrace]) {}
 
   @override
   final HttpHeaders headers = _MockHttpHeaders();
