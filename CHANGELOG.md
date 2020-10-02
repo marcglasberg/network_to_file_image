@@ -1,4 +1,4 @@
-## [2.3.4] - 2020/09/23
+## [2.3.5] - 2020/09/24
 
 * Improving compatibility with Flutter 1.22.0-10.0.pre.39 (master channel) 
 

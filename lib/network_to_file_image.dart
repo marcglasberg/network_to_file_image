@@ -273,6 +273,9 @@ class _MockHttpClient implements HttpClient {
   _MockHttpClient(this._realClient);
 
   @override
+  void abort([Object exception, StackTrace stackTrace]) {}
+
+  @override
   bool get autoUncompress => _realClient.autoUncompress;
 
   @override
