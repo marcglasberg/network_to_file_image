@@ -1,3 +1,7 @@
+## [2.3.7] - 2021/01/07
+
+* Docs improvement.
+
 ## [2.3.6] - 2020/10/02
 
 * Improving compatibility with Flutter 1.22. 

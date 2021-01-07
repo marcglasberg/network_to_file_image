@@ -58,7 +58,11 @@ the file or fetched from the network:
               debug: true))    
 
 Try running the <a href="https://github.com/marcglasberg/network_to_file_image/blob/master/example/lib/main.dart">NetworkToFileImage example</a>.
+   
+### Important:
 
+The directory where you want to save the image must already exist in the local disk. 
+Otherwise, the image won't be saved.
 
 ## Canvas
 
