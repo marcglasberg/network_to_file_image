@@ -54,22 +54,21 @@ import 'package:flutter/material.dart';
 class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   //
   const NetworkToFileImage({
-    @required this.file,
-    @required this.url,
+    this.file,
+    this.url,
     this.scale = 1.0,
     this.headers,
     this.debug = false,
-    ProcessError processError,
-  })  : assert(file != null || url != null),
-        assert(scale != null);
+    ProcessError? processError,
+  }) : assert(file != null || url != null);
 
-  final File file;
-  final String url;
+  final File? file;
+  final String? url;
   final double scale;
-  final Map<String, String> headers;
+  final Map<String, String>? headers;
   final bool debug;
 
-  static final Map<String, Uint8List> _mockFiles = {};
+  static final Map<String, Uint8List?> _mockFiles = {};
   static final Map<String, Uint8List> _mockUrls = {};
 
   /// Call this if you want your mock urls to be visible for regular http requests.
@@ -82,15 +81,13 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   }
 
   /// You can set mock files. It searches for an exact file.path (string comparison).
-  /// For example, to set an empty file: setMockFile(File("photo.png"), null);
-  static void setMockFile(File file, Uint8List bytes) {
-    assert(file != null);
+  /// To set an empty file, use null: `setMockFile(File("photo.png"), null);`
+  static void setMockFile(File file, Uint8List? bytes) {
     _mockFiles[file.path] = bytes;
   }
 
   /// You can set mock urls. It searches for an exact url (string comparison).
   static void setMockUrl(String url, Uint8List bytes) {
-    assert(url != null);
     _mockUrls[url] = bytes;
   }
 
@@ -139,11 +136,11 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
       assert(key == this);
       // ---
 
-      Uint8List bytes;
+      Uint8List? bytes;
 
       // Reads a MOCK file.
-      if (file != null && _mockFiles.containsKey(file.path)) {
-        bytes = _mockFiles[file.path];
+      if (file != null && _mockFiles.containsKey(file!.path)) {
+        bytes = _mockFiles[file!.path];
       }
 
       // Reads from the local file.
@@ -153,12 +150,12 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
 
       // Reads from the MOCK network and saves it to the local file.
       // Note: This wouldn't be necessary when startHttpOverride() is called.
-      else if (url != null && url.isNotEmpty && _mockUrls.containsKey(url)) {
+      else if (url != null && url!.isNotEmpty && _mockUrls.containsKey(url)) {
         bytes = await _downloadFromTheMockNetworkAndSaveToTheLocalFile();
       }
 
       // Reads from the network and saves it to the local file.
-      else if (url != null && url.isNotEmpty) {
+      else if (url != null && url!.isNotEmpty) {
         bytes = await _downloadFromTheNetworkAndSaveToTheLocalFile(chunkEvents);
       }
 
@@ -167,18 +164,18 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
       // Empty file.
       if ((bytes != null) && (bytes.lengthInBytes == 0)) bytes = null;
 
-      return await decode(bytes);
+      return await decode(bytes!);
     } finally {
       chunkEvents.close();
     }
   }
 
-  bool _ifFileExistsLocally() => file.existsSync();
+  bool _ifFileExistsLocally() => file!.existsSync();
 
-  Future<Uint8List> _readFromTheLocalFile() async {
+  Future<Uint8List?> _readFromTheLocalFile() async {
     if (debug) print("Reading image file: ${file?.path}");
 
-    final Uint8List bytes = await file.readAsBytes();
+    final Uint8List bytes = await file!.readAsBytes();
     if (bytes.lengthInBytes == 0) return null;
 
     return bytes;
@@ -187,11 +184,11 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   Future<Uint8List> _downloadFromTheNetworkAndSaveToTheLocalFile(
     StreamController<ImageChunkEvent> chunkEvents,
   ) async {
-    assert(url != null && url.isNotEmpty);
+    assert(url != null && url!.isNotEmpty);
     if (debug) print("Fetching image from: $url");
     // ---
 
-    final Uri resolved = Uri.base.resolve(url);
+    final Uri resolved = Uri.base.resolve(url!);
     final HttpClientRequest request = await HttpClient().getUrl(resolved);
     headers?.forEach((String name, String value) {
       request.headers.add(name, value);
@@ -202,7 +199,7 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
 
     final Uint8List bytes = await consolidateHttpClientResponseBytes(
       response,
-      onBytesReceived: (int cumulative, int total) {
+      onBytesReceived: (int cumulative, int? total) {
         chunkEvents.add(ImageChunkEvent(
           cumulativeBytesLoaded: cumulative,
           expectedTotalBytes: total,
@@ -219,12 +216,12 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   }
 
   Future<Uint8List> _downloadFromTheMockNetworkAndSaveToTheLocalFile() async {
-    assert(url != null && url.isNotEmpty);
+    assert(url != null && url!.isNotEmpty);
     if (debug) print("Fetching image from: $url");
     // ---
 
-    final Uri resolved = Uri.base.resolve(url);
-    Uint8List bytes = _mockUrls[url];
+    final Uri resolved = Uri.base.resolve(url!);
+    Uint8List bytes = _mockUrls[url!]!;
     if (bytes.lengthInBytes == 0) {
       throw Exception('NetworkImage is an empty file: $resolved');
     }
@@ -234,20 +231,20 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
 
   void saveImageToTheLocalFile(Uint8List bytes) async {
     if (debug) print("Saving image to file: ${file?.path}");
-    file.writeAsBytes(bytes, flush: true);
+    file!.writeAsBytes(bytes, flush: true);
   }
 
   @override
   bool operator ==(Object other) {
     if (other.runtimeType != runtimeType) return false;
-    final NetworkToFileImage typedOther = other;
-    return url == typedOther.url &&
-        file?.path == typedOther.file?.path &&
-        scale == typedOther.scale;
+    return other is NetworkToFileImage &&
+        other.file?.path == file?.path &&
+        other.url == url &&
+        other.scale == scale;
   }
 
   @override
-  int get hashCode => hashValues(url, file?.path, scale);
+  int get hashCode => hashValues(file?.path, url, scale);
 
   @override
   String toString() => '$runtimeType("${file?.path}", "$url", scale: $scale)';
@@ -259,7 +256,7 @@ typedef ProcessError = void Function(dynamic error);
 
 class _MockHttpOverrides extends HttpOverrides {
   @override
-  HttpClient createHttpClient(SecurityContext context) {
+  HttpClient createHttpClient(SecurityContext? context) {
     return _MockHttpClient(super.createHttpClient(context));
   }
 }
@@ -279,10 +276,10 @@ class _MockHttpClient implements HttpClient {
   set autoUncompress(bool value) => _realClient.autoUncompress = value;
 
   @override
-  Duration get connectionTimeout => _realClient.connectionTimeout;
+  Duration? get connectionTimeout => _realClient.connectionTimeout;
 
   @override
-  set connectionTimeout(Duration value) => _realClient.connectionTimeout = value;
+  set connectionTimeout(Duration? value) => _realClient.connectionTimeout = value;
 
   @override
   Duration get idleTimeout => _realClient.idleTimeout;
@@ -291,16 +288,16 @@ class _MockHttpClient implements HttpClient {
   set idleTimeout(Duration value) => _realClient.idleTimeout = value;
 
   @override
-  int get maxConnectionsPerHost => _realClient.maxConnectionsPerHost;
+  int? get maxConnectionsPerHost => _realClient.maxConnectionsPerHost;
 
   @override
-  set maxConnectionsPerHost(int value) => _realClient.maxConnectionsPerHost = value;
+  set maxConnectionsPerHost(int? value) => _realClient.maxConnectionsPerHost = value;
 
   @override
-  String get userAgent => _realClient.userAgent;
+  String? get userAgent => _realClient.userAgent;
 
   @override
-  set userAgent(String value) => _realClient.userAgent = value;
+  set userAgent(String? value) => _realClient.userAgent = value;
 
   @override
   void addCredentials(Uri url, String realm, HttpClientCredentials credentials) =>
@@ -312,16 +309,17 @@ class _MockHttpClient implements HttpClient {
       _realClient.addProxyCredentials(host, port, realm, credentials);
 
   @override
-  set authenticate(Future<bool> Function(Uri url, String scheme, String realm) f) =>
+  set authenticate(Future<bool> Function(Uri url, String scheme, String realm)? f) =>
       _realClient.authenticate = f;
 
   @override
   set authenticateProxy(
-          Future<bool> Function(String host, int port, String scheme, String realm) f) =>
+          Future<bool> Function(String host, int port, String scheme, String realm)? f) =>
       _realClient.authenticateProxy = f;
 
   @override
-  set badCertificateCallback(bool Function(X509Certificate cert, String host, int port) callback) =>
+  set badCertificateCallback(
+          bool Function(X509Certificate cert, String host, int port)? callback) =>
       _realClient.badCertificateCallback = callback;
 
   @override
@@ -335,7 +333,7 @@ class _MockHttpClient implements HttpClient {
   Future<HttpClientRequest> deleteUrl(Uri url) => _realClient.deleteUrl(url);
 
   @override
-  set findProxy(String Function(Uri url) f) => _realClient.findProxy = f;
+  set findProxy(String Function(Uri url)? f) => _realClient.findProxy = f;
 
   @override
   Future<HttpClientRequest> get(String host, int port, String path) =>
@@ -344,9 +342,9 @@ class _MockHttpClient implements HttpClient {
   /// Searches the mock first.
   @override
   Future<HttpClientRequest> getUrl(Uri url) async {
-    String urlStr = url?.toString();
+    String urlStr = url.toString();
 
-    if (urlStr != null && urlStr.isNotEmpty && NetworkToFileImage._mockUrls.containsKey(urlStr)) {
+    if (urlStr.isNotEmpty && NetworkToFileImage._mockUrls.containsKey(urlStr)) {
       return _MockHttpClientRequest(NetworkToFileImage._mockUrls[urlStr]);
     }
 
@@ -367,9 +365,9 @@ class _MockHttpClient implements HttpClient {
   @override
   Future<HttpClientRequest> openUrl(String method, Uri url) async {
     if (method == "GET") {
-      String urlStr = url?.toString();
+      String urlStr = url.toString();
 
-      if (urlStr != null && urlStr.isNotEmpty && NetworkToFileImage._mockUrls.containsKey(urlStr)) {
+      if (urlStr.isNotEmpty && NetworkToFileImage._mockUrls.containsKey(urlStr)) {
         return _MockHttpClientRequest(NetworkToFileImage._mockUrls[urlStr]);
       }
     }
@@ -402,12 +400,12 @@ class _MockHttpClient implements HttpClient {
 
 class _MockHttpClientRequest extends HttpClientRequest {
   //
-  final Uint8List bytes;
+  final Uint8List? bytes;
 
   _MockHttpClientRequest(this.bytes);
 
   @override
-  Encoding encoding;
+  late Encoding encoding;
 
   @override
   final HttpHeaders headers = _MockHttpHeaders();
@@ -416,7 +414,7 @@ class _MockHttpClientRequest extends HttpClientRequest {
   void add(List<int> data) {}
 
   @override
-  void addError(Object error, [StackTrace stackTrace]) {}
+  void addError(Object error, [StackTrace? stackTrace]) {}
 
   @override
   Future<void> addStream(Stream<List<int>> stream) {
@@ -427,14 +425,14 @@ class _MockHttpClientRequest extends HttpClientRequest {
   Future<HttpClientResponse> close() => done;
 
   @override
-  HttpConnectionInfo get connectionInfo => null;
+  HttpConnectionInfo? get connectionInfo => null;
 
   @override
-  List<Cookie> get cookies => null;
+  List<Cookie> get cookies => [];
 
   @override
   Future<HttpClientResponse> get done =>
-      SynchronousFuture<HttpClientResponse>(_MockHttpClientResponse(bytes));
+      SynchronousFuture<HttpClientResponse>(_MockHttpClientResponse(bytes!));
 
   @override
   Future<void> flush() {
@@ -442,25 +440,25 @@ class _MockHttpClientRequest extends HttpClientRequest {
   }
 
   @override
-  String get method => null;
+  String get method => "";
 
   @override
-  Uri get uri => null;
+  Uri get uri => Uri();
 
   @override
-  void write(Object obj) {}
+  void write(Object? obj) {}
 
   @override
-  void writeAll(Iterable<Object> objects, [String separator = '']) {}
+  void writeAll(Iterable<Object?> objects, [String separator = '']) {}
 
   @override
   void writeCharCode(int charCode) {}
 
   @override
-  void writeln([Object obj = '']) {}
+  void writeln([Object? obj = '']) {}
 
   @override
-  void abort([Object exception, StackTrace stackTrace]) {}
+  void abort([Object? exception, StackTrace? stackTrace]) {}
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -478,10 +476,10 @@ class _MockHttpClientResponse implements HttpClientResponse {
   final HttpHeaders headers = _MockHttpHeaders();
 
   @override
-  X509Certificate get certificate => null;
+  X509Certificate? get certificate => null;
 
   @override
-  HttpConnectionInfo get connectionInfo => null;
+  HttpConnectionInfo? get connectionInfo => null;
 
   @override
   int get contentLength => _contentLength;
@@ -492,7 +490,7 @@ class _MockHttpClientResponse implements HttpClientResponse {
   }
 
   @override
-  List<Cookie> get cookies => null;
+  List<Cookie> get cookies => [];
 
   @override
   Future<Socket> detachSocket() {
@@ -503,19 +501,19 @@ class _MockHttpClientResponse implements HttpClientResponse {
   bool get isRedirect => false;
 
   @override
-  StreamSubscription<Uint8List> listen(void Function(Uint8List event) onData,
-      {Function onError, void Function() onDone, bool cancelOnError}) {
+  StreamSubscription<Uint8List> listen(void Function(Uint8List event)? onData,
+      {Function? onError, void Function()? onDone, bool? cancelOnError}) {
     return _delegate.listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }
 
   @override
-  bool get persistentConnection => null;
+  bool get persistentConnection => false;
 
   @override
-  String get reasonPhrase => null;
+  String get reasonPhrase => "";
 
   @override
-  Future<HttpClientResponse> redirect([String method, Uri url, bool followLoops]) {
+  Future<HttpClientResponse> redirect([String? method, Uri? url, bool? followLoops]) {
     return Future<HttpClientResponse>.error(UnsupportedError('Mocked response'));
   }
 
@@ -532,14 +530,14 @@ class _MockHttpClientResponse implements HttpClientResponse {
 
   @override
   Stream<Uint8List> asBroadcastStream({
-    void Function(StreamSubscription<Uint8List> subscription) onListen,
-    void Function(StreamSubscription<Uint8List> subscription) onCancel,
+    void Function(StreamSubscription<Uint8List> subscription)? onListen,
+    void Function(StreamSubscription<Uint8List> subscription)? onCancel,
   }) {
     return _delegate.asBroadcastStream(onListen: onListen, onCancel: onCancel);
   }
 
   @override
-  Stream<E> asyncExpand<E>(Stream<E> Function(Uint8List event) convert) {
+  Stream<E> asyncExpand<E>(Stream<E>? Function(Uint8List event) convert) {
     return _delegate.asyncExpand<E>(convert);
   }
 
@@ -554,17 +552,17 @@ class _MockHttpClientResponse implements HttpClientResponse {
   }
 
   @override
-  Future<bool> contains(Object needle) {
+  Future<bool> contains(Object? needle) {
     return _delegate.contains(needle);
   }
 
   @override
-  Stream<Uint8List> distinct([bool Function(Uint8List previous, Uint8List next) equals]) {
+  Stream<Uint8List> distinct([bool Function(Uint8List previous, Uint8List next)? equals]) {
     return _delegate.distinct(equals);
   }
 
   @override
-  Future<E> drain<E>([E futureValue]) {
+  Future<E> drain<E>([E? futureValue]) {
     return _delegate.drain<E>(futureValue);
   }
 
@@ -589,10 +587,10 @@ class _MockHttpClientResponse implements HttpClientResponse {
   @override
   Future<Uint8List> firstWhere(
     bool Function(Uint8List element) test, {
-    List<int> Function() orElse,
+    List<int> Function()? orElse,
   }) {
     return _delegate.firstWhere(test, orElse: () {
-      return Uint8List.fromList(orElse());
+      return Uint8List.fromList(orElse!());
     });
   }
 
@@ -609,7 +607,7 @@ class _MockHttpClientResponse implements HttpClientResponse {
   @override
   Stream<Uint8List> handleError(
     Function onError, {
-    bool Function(dynamic error) test,
+    bool Function(dynamic error)? test,
   }) {
     return _delegate.handleError(onError, test: test);
   }
@@ -631,10 +629,10 @@ class _MockHttpClientResponse implements HttpClientResponse {
   @override
   Future<Uint8List> lastWhere(
     bool Function(Uint8List element) test, {
-    List<int> Function() orElse,
+    List<int> Function()? orElse,
   }) {
     return _delegate.lastWhere(test, orElse: () {
-      return Uint8List.fromList(orElse());
+      return Uint8List.fromList(orElse!());
     });
   }
 
@@ -664,10 +662,10 @@ class _MockHttpClientResponse implements HttpClientResponse {
   @override
   Future<Uint8List> singleWhere(
     bool Function(Uint8List element) test, {
-    List<int> Function() orElse,
+    List<int> Function()? orElse,
   }) {
     return _delegate.singleWhere(test, orElse: () {
-      return Uint8List.fromList(orElse());
+      return Uint8List.fromList(orElse!());
     });
   }
 
@@ -694,7 +692,7 @@ class _MockHttpClientResponse implements HttpClientResponse {
   @override
   Stream<Uint8List> timeout(
     Duration timeLimit, {
-    void Function(EventSink<Uint8List> sink) onTimeout,
+    void Function(EventSink<Uint8List> sink)? onTimeout,
   }) {
     return _delegate.timeout(timeLimit, onTimeout: onTimeout);
   }
@@ -749,7 +747,7 @@ class _MockHttpHeaders extends HttpHeaders {
   void set(String name, Object value, {bool preserveHeaderCase = false}) {}
 
   @override
-  String value(String name) => null;
+  String? value(String name) => null;
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////

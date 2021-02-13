@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
-typedef LoadCallback<T> = void Function(ImageInfo image, T obj, Object key);
+typedef LoadCallback<T> = void Function(ImageInfo image, T obj, Object? key);
 
 /// IMPORTANT: See example file: main_image_for_canvas.dart
 ///
@@ -37,24 +37,24 @@ typedef LoadCallback<T> = void Function(ImageInfo image, T obj, Object key);
 /// ```
 ///
 class ImageForCanvas<T> {
-  static final Map<Object, ui.Image> _images = {};
+  static final Map<Object?, ui.Image?> _images = {};
 
   ImageForCanvas({
-    @required this.imageProviderSupplier,
-    @required this.loadCallback,
+    required this.imageProviderSupplier,
+    required this.loadCallback,
     this.keySupplier,
-  }) : assert(imageProviderSupplier != null);
+  });
 
   final ImageProvider Function(T obj) imageProviderSupplier;
 
-  final LoadCallback<T> loadCallback;
+  final LoadCallback<T>? loadCallback;
 
-  final Object Function(T obj) keySupplier;
+  final Object Function(T obj)? keySupplier;
 
   void clearInternalCache() => _images.clear();
 
-  ui.Image image(T obj) {
-    var key = (keySupplier == null) ? obj : keySupplier(obj);
+  ui.Image? image(T obj) {
+    var key = (keySupplier == null) ? obj : keySupplier!(obj);
     var image = _images[key];
 
     if (image == null) {
@@ -63,33 +63,37 @@ class ImageForCanvas<T> {
 
         ImageProvider imgProvider = imageProviderSupplier(obj);
 
-        var decoder = (Uint8List bytes, {bool allowUpscaling, int cacheWidth, int cacheHeight}) =>
-            PaintingBinding.instance
+        Future<ui.Codec> Function(Uint8List,
+            {bool allowUpscaling, int? cacheHeight, int? cacheWidth}) decoder = (Uint8List bytes,
+                {bool? allowUpscaling, int? cacheWidth, int? cacheHeight}) =>
+            PaintingBinding.instance!
                 .instantiateImageCodec(bytes, cacheWidth: cacheWidth, cacheHeight: cacheHeight);
 
-        final ImageStreamCompleter completer = PaintingBinding.instance.imageCache.putIfAbsent(
+        // When an exception is caught resolving an image, no completers are
+        // cached and `null` is returned instead of a new completer.
+        final ImageStreamCompleter? completer = PaintingBinding.instance!.imageCache!.putIfAbsent(
           // ignore: invalid_use_of_protected_member
           imgProvider,
           // ignore: invalid_use_of_protected_member
           () => imgProvider.load(imgProvider, decoder),
           onError: null,
-        );
+        )!;
 
-        assert(completer != null);
-
-        ImageListener onImage = (ImageInfo image, bool synchronousCall) {
-          _onImage(image, obj, key);
-        };
-        ImageStreamListener listener = ImageStreamListener(onImage);
-        completer.addListener(listener);
+        if (completer != null) {
+          ImageListener onImage = (ImageInfo image, bool synchronousCall) {
+            _onImage(image, obj, key);
+          };
+          ImageStreamListener listener = ImageStreamListener(onImage);
+          completer.addListener(listener);
+        }
       }
     }
 
     return image;
   }
 
-  void _onImage(ImageInfo image, T obj, Object key) {
+  void _onImage(ImageInfo image, T obj, Object? key) {
     _images[key] = image.image;
-    if (loadCallback != null) loadCallback(image, obj, key);
+    loadCallback?.call(image, obj, key);
   }
 }
