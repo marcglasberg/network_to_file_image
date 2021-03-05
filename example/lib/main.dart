@@ -4,7 +4,7 @@ import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-Directory _appDocsDir;
+late Directory _appDocsDir;
 
 void main() async {
   // You should get the Application Documents Directory only once.

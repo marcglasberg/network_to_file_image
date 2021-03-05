@@ -1,3 +1,7 @@
+## [3.0.0] - 2021/03/05
+
+* Docs improvement.
+
 ## [2.3.8] - 2021/01/07
 
 * Docs improvement.

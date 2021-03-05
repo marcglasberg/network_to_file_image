@@ -45,7 +45,7 @@ Then, create the image:
 
     Image(image: 
             NetworkToFileImage(
-              url: "http://example.com/someFile.png", 
+              url: "https://example.com/someFile.png", 
               file: myFile))
 
 If you make `debug: true` it prints to the console whether the image was read from 
@@ -53,7 +53,7 @@ the file or fetched from the network:
 
     Image(image: 
             NetworkToFileImage(
-              url: "http://example.com/someFile.png", 
+              url: "https://example.com/someFile.png", 
               file: myFile, 
               debug: true))    
 

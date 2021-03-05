@@ -6,7 +6,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'dart:ui' as ui;
 
-Directory _appDocsDir;
+late Directory _appDocsDir;
 
 void main() async {
   // You should get the Application Documents Directory only once.
@@ -19,8 +19,8 @@ void main() async {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class User {
-  final String filename;
-  final String url;
+  final String? filename;
+  final String? url;
 
   User({
     this.filename,
@@ -68,10 +68,10 @@ class MyPainter extends CustomPainter {
 
   MyPainter(
     this.user, {
-    @required this.loadCallback,
+    required this.loadCallback,
   });
 
-  File fileFromDocsDir(String filename) {
+  File fileFromDocsDir(String? filename) {
     String pathName = p.join(_appDocsDir.path, filename);
     return File(pathName);
   }
@@ -83,7 +83,7 @@ class MyPainter extends CustomPainter {
 
     var imageForCanvas = _imageForCanvas();
 
-    ui.Image image = imageForCanvas.image(user);
+    ui.Image? image = imageForCanvas.image(user);
 
     // While the image is loading it is null, so we don't paint anything.
     if (image != null) {
@@ -103,7 +103,7 @@ class MyPainter extends CustomPainter {
         //
 
         // The key should uniquely identify the image.
-        keySupplier: (User user) => user.url,
+        keySupplier: (User user) => user.url!,
 
         // The load callback will be called as soon as the image finishes
         // loading. Usually this should call setState on the widget that
