@@ -309,12 +309,12 @@ class _MockHttpClient implements HttpClient {
       _realClient.addProxyCredentials(host, port, realm, credentials);
 
   @override
-  set authenticate(Future<bool> Function(Uri url, String scheme, String realm)? f) =>
+  set authenticate(Future<bool> Function(Uri url, String scheme, String? realm)? f) =>
       _realClient.authenticate = f;
 
   @override
   set authenticateProxy(
-          Future<bool> Function(String host, int port, String scheme, String realm)? f) =>
+          Future<bool> Function(String host, int port, String scheme, String? realm)? f) =>
       _realClient.authenticateProxy = f;
 
   @override
