@@ -1,3 +1,7 @@
+## [3.0.1] - 2021/09/11
+
+* Compatible with Flutter 2.5.
+
 ## [3.0.0] - 2021/03/05
 
 * Docs improvement.
