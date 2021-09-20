@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:network_to_file_image/image_for_canvas.dart';
 import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
