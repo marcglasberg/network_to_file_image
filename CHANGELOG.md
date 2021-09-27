@@ -1,3 +1,7 @@
+## [3.0.3] - 2021/09/27
+
+* Fixed problem with errorBuilder (https://github.com/marcglasberg/network_to_file_image/issues/27).
+
 ## [3.0.2] - 2021/09/11
 
 * Compatible with Flutter 2.5.
@@ -12,7 +16,7 @@
 
 ## [2.3.6] - 2020/10/02
 
-* Improving compatibility with Flutter 1.22. 
+* Improving compatibility with Flutter 1.22.
 
 ## [2.3.3] - 2020/09/14
 
@@ -22,7 +26,7 @@
 
 * Upgrade: Flutter 1.20.
 * Example: main_image_for_canvas.dart
-  
+
 ## [2.3.1] - 2020/05/19
 
 * Docs improvement.
@@ -35,31 +39,31 @@
 
 * Docs improvement.
 * Better example (appDocsDir is read only once, during app initialization).
- 
+
 ## [2.2.4] - 2019/12/21
 
-* Http override (mock urls visible to the whole app). 
+* Http override (mock urls visible to the whole app).
 
 ## [2.2.1] - 2019/12/11
 
-* Upgrade: Dart 2.7 (as per https://github.com/flutter/flutter/pull/41415). 
-  
+* Upgrade: Dart 2.7 (as per https://github.com/flutter/flutter/pull/41415).
+
 ## [2.1.5] - 2019/10/31
 
-* ImageForCanvas. 
-  
+* ImageForCanvas.
+
 ## [2.0.7] - 2019/09/12
 
-* ErrorDescription. 
-  
+* ErrorDescription.
+
 ## [2.0.6] - 2019/08/13
 
-* Docs improvement. 
-  
+* Docs improvement.
+
 ## [2.0.2] - 2019/06/24
 
-* Commented out the informationCollector, until version 1.7.8. 
-  
+* Commented out the informationCollector, until version 1.7.8.
+
 ## [2.0.0] - 2019/06/24
 
 * Reverted back to stable Flutter version 1.5.X.
@@ -73,9 +77,9 @@
 * This version works for the stable Flutter version 1.5.X.
 
 ## [1.0.3] - 2019/01/16
- 
+
 * Allow mock urls.
- 
+
 ## [1.0.2] - 2019/01/04
 
 * Details.

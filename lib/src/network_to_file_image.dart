@@ -120,10 +120,12 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
         codec: _loadAsync(key, chunkEvents, decode),
         chunkEvents: chunkEvents.stream,
         scale: key.scale,
-        informationCollector: () sync* {
-          yield ErrorDescription('Image provider: $this');
-          yield ErrorDescription('File: ${file?.path}');
-          yield ErrorDescription('Url: $url');
+        informationCollector: () {
+          return <DiagnosticsNode>[
+            ErrorDescription('Image provider: $this'),
+            ErrorDescription('File: ${file?.path}'),
+            ErrorDescription('Url: $url'),
+          ];
         });
   }
 
@@ -136,66 +138,83 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
       assert(key == this);
       // ---
 
-      Uint8List? bytes;
+      File? file = key.file;
+      String? url = key.url;
+
+      late Uint8List bytes;
 
       // Reads a MOCK file.
-      if (file != null && _mockFiles.containsKey(file!.path)) {
-        bytes = _mockFiles[file!.path];
+      if (file != null && _mockFiles.containsKey(file.path)) {
+        bytes = _mockFiles[file.path] ?? Uint8List(0);
       }
 
       // Reads from the local file.
-      else if (file != null && _ifFileExistsLocally()) {
-        bytes = await _readFromTheLocalFile();
+      else if (file != null && _ifFileExistsLocally(file)) {
+        bytes = await _readFromTheLocalFile(file);
       }
 
       // Reads from the MOCK network and saves it to the local file.
       // Note: This wouldn't be necessary when startHttpOverride() is called.
-      else if (url != null && url!.isNotEmpty && _mockUrls.containsKey(url)) {
-        bytes = await _downloadFromTheMockNetworkAndSaveToTheLocalFile();
+      else if (url != null && url.isNotEmpty && _mockUrls.containsKey(url)) {
+        bytes = await _downloadFromTheMockNetworkAndSaveToTheLocalFile(file, url);
       }
 
       // Reads from the network and saves it to the local file.
-      else if (url != null && url!.isNotEmpty) {
-        bytes = await _downloadFromTheNetworkAndSaveToTheLocalFile(chunkEvents);
+      else if (url != null && url.isNotEmpty) {
+        bytes = await _downloadFromTheNetworkAndSaveToTheLocalFile(chunkEvents, file, url);
       }
 
       // ---
 
-      // Empty file.
-      if ((bytes != null) && (bytes.lengthInBytes == 0)) bytes = null;
+      return decode(bytes);
 
-      return await decode(bytes!);
+      //
+    } catch (e) {
+      // Depending on where the exception was thrown, the image cache may not
+      // have had a chance to track the key in the cache at all.
+      // Schedule a microtask to give the cache a chance to add the key.
+      scheduleMicrotask(() {
+        PaintingBinding.instance!.imageCache!.evict(key);
+      });
+      rethrow;
     } finally {
       chunkEvents.close();
     }
   }
 
-  bool _ifFileExistsLocally() => file!.existsSync();
+  bool _ifFileExistsLocally(File file) => file.existsSync();
 
-  Future<Uint8List?> _readFromTheLocalFile() async {
-    if (debug) print("Reading image file: ${file?.path}");
-
-    final Uint8List bytes = await file!.readAsBytes();
-    if (bytes.lengthInBytes == 0) return null;
-
+  Future<Uint8List> _readFromTheLocalFile(File file) async {
+    if (debug) print("Reading image file: ${file.path}");
+    final Uint8List bytes = await file.readAsBytes();
     return bytes;
   }
 
   Future<Uint8List> _downloadFromTheNetworkAndSaveToTheLocalFile(
     StreamController<ImageChunkEvent> chunkEvents,
+    File? file,
+    String url,
   ) async {
-    assert(url != null && url!.isNotEmpty);
+    assert(url.isNotEmpty);
     if (debug) print("Fetching image from: $url");
     // ---
 
-    final Uri resolved = Uri.base.resolve(url!);
-    final HttpClientRequest request = await HttpClient().getUrl(resolved);
+    final Uri resolved = Uri.base.resolve(url);
+
+    final HttpClientRequest request = await _httpClient.getUrl(resolved);
+
     headers?.forEach((String name, String value) {
       request.headers.add(name, value);
     });
     final HttpClientResponse response = await request.close();
-    if (response.statusCode != HttpStatus.ok)
+    if (response.statusCode != HttpStatus.ok) {
+      if (debug) print("Failed fetching image from: $url");
+      // The network may be only temporarily unavailable, or the file will be
+      // added on the server later. Avoid having future calls to resolve
+      // fail to check the network again.
+      await response.drain<List<int>?>();
       throw NetworkImageLoadException(statusCode: response.statusCode, uri: resolved);
+    }
 
     final Uint8List bytes = await consolidateHttpClientResponseBytes(
       response,
@@ -207,31 +226,49 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
       },
     );
     if (bytes.lengthInBytes == 0) {
-      throw Exception('NetworkImage is an empty file: $resolved');
+      throw Exception('Image is an empty file: $resolved');
     }
 
-    if (file != null) saveImageToTheLocalFile(bytes);
+    if (file != null) saveImageToTheLocalFile(file, bytes);
 
     return bytes;
   }
 
-  Future<Uint8List> _downloadFromTheMockNetworkAndSaveToTheLocalFile() async {
-    assert(url != null && url!.isNotEmpty);
+  // Do not access this field directly; use [_httpClient] instead.
+  // We set `autoUncompress` to false to ensure that we can trust the value of
+  // the `Content-Length` HTTP header. We automatically uncompress the content
+  // in our call to [consolidateHttpClientResponseBytes].
+  static final HttpClient _sharedHttpClient = HttpClient()..autoUncompress = false;
+
+  static HttpClient get _httpClient {
+    HttpClient client = _sharedHttpClient;
+    assert(() {
+      if (debugNetworkImageHttpClientProvider != null)
+        client = debugNetworkImageHttpClientProvider!();
+      return true;
+    }());
+    return client;
+  }
+
+  Future<Uint8List> _downloadFromTheMockNetworkAndSaveToTheLocalFile(File? file, String url) async {
+    assert(url.isNotEmpty);
     if (debug) print("Fetching image from: $url");
     // ---
 
-    final Uri resolved = Uri.base.resolve(url!);
-    Uint8List bytes = _mockUrls[url!]!;
+    final Uri resolved = Uri.base.resolve(url);
+    Uint8List bytes = _mockUrls[url] ?? Uint8List(0);
     if (bytes.lengthInBytes == 0) {
       throw Exception('NetworkImage is an empty file: $resolved');
     }
-    if (file != null) saveImageToTheLocalFile(bytes);
+
+    if (file != null) saveImageToTheLocalFile(file, bytes);
+
     return bytes;
   }
 
-  void saveImageToTheLocalFile(Uint8List bytes) async {
-    if (debug) print("Saving image to file: ${file?.path}");
-    file!.writeAsBytes(bytes, flush: true);
+  void saveImageToTheLocalFile(File file, Uint8List bytes) async {
+    if (debug) print("Saving image to file: ${file.path}");
+    file.writeAsBytes(bytes, flush: true);
   }
 
   @override

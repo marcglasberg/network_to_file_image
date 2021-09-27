@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:path/path.dart' as p;
@@ -19,19 +20,51 @@ File fileFromDocsDir(String filename) {
   return File(pathName);
 }
 
-class Demo extends StatelessWidget {
+class Demo extends StatefulWidget {
+  @override
+  State<Demo> createState() => _DemoState();
+}
+
+class _DemoState extends State<Demo> {
+  int count = 0;
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(title: const Text('NetworkToFileImage example')),
         body: Padding(
           padding: const EdgeInsets.all(30.0),
-          child: Image(
-            image: NetworkToFileImage(
-              url: "https://upload.wikimedia.org/wikipedia/commons/1/17/Google-flutter-logo.png",
-              file: fileFromDocsDir("flutter.png"),
-              debug: true,
-            ),
+          child: Column(
+            children: [
+              _image(),
+              const SizedBox(height: 30),
+              _button(),
+            ],
           ),
         ),
       );
+
+  Widget _image() {
+    return Image(
+      key: ValueKey(count),
+      image: NetworkToFileImage(
+        url: "https://upload.wikimedia.org/wikipedia/commons/1/17/Google-flutter-logo.png",
+        file: fileFromDocsDir("flutter.png"),
+        debug: true,
+      ),
+      errorBuilder: (context, error, stackTrace) {
+        return Text('Download image failed.');
+      },
+    );
+  }
+
+  Widget _button() {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          count++;
+        });
+      },
+      child: Text('Rebuild image widget!'),
+    );
+  }
 }
