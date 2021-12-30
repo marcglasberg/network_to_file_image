@@ -1,3 +1,7 @@
+## [3.1.0] - 2021/12/29
+
+* Now `ImageForCanvas.imageProviderSupplier` may return a null `ImageProvider`.
+
 ## [3.0.3] - 2021/09/27
 
 * Fixed problem with errorBuilder (https://github.com/marcglasberg/network_to_file_image/issues/27).

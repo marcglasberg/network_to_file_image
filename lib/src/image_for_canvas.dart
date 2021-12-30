@@ -45,7 +45,7 @@ class ImageForCanvas<T> {
     this.keySupplier,
   });
 
-  final ImageProvider Function(T obj) imageProviderSupplier;
+  final ImageProvider? Function(T obj) imageProviderSupplier;
 
   final LoadCallback<T>? loadCallback;
 
@@ -61,30 +61,34 @@ class ImageForCanvas<T> {
       if (!_images.containsKey(key)) {
         _images[key] = null;
 
-        ImageProvider imgProvider = imageProviderSupplier(obj);
+        ImageProvider? imgProvider = imageProviderSupplier(obj);
 
-        Future<ui.Codec> Function(Uint8List,
-            {bool allowUpscaling, int? cacheHeight, int? cacheWidth}) decoder = (Uint8List bytes,
-                {bool? allowUpscaling, int? cacheWidth, int? cacheHeight}) =>
-            PaintingBinding.instance!
-                .instantiateImageCodec(bytes, cacheWidth: cacheWidth, cacheHeight: cacheHeight);
+        if (imgProvider == null)
+          return null;
+        else {
+          Future<ui.Codec> Function(Uint8List,
+              {bool allowUpscaling, int? cacheHeight, int? cacheWidth}) decoder = (Uint8List bytes,
+                  {bool? allowUpscaling, int? cacheWidth, int? cacheHeight}) =>
+              PaintingBinding.instance!
+                  .instantiateImageCodec(bytes, cacheWidth: cacheWidth, cacheHeight: cacheHeight);
 
-        // When an exception is caught resolving an image, no completers are
-        // cached and `null` is returned instead of a new completer.
-        final ImageStreamCompleter? completer = PaintingBinding.instance!.imageCache!.putIfAbsent(
-          // ignore: invalid_use_of_protected_member
-          imgProvider,
-          // ignore: invalid_use_of_protected_member
-          () => imgProvider.load(imgProvider, decoder),
-          onError: null,
-        )!;
+          // When an exception is caught resolving an image, no completers are
+          // cached and `null` is returned instead of a new completer.
+          final ImageStreamCompleter? completer = PaintingBinding.instance!.imageCache!.putIfAbsent(
+            // ignore: invalid_use_of_protected_member
+            imgProvider,
+            // ignore: invalid_use_of_protected_member
+            () => imgProvider.load(imgProvider, decoder),
+            onError: null,
+          )!;
 
-        if (completer != null) {
-          ImageListener onImage = (ImageInfo image, bool synchronousCall) {
-            _onImage(image, obj, key);
-          };
-          ImageStreamListener listener = ImageStreamListener(onImage);
-          completer.addListener(listener);
+          if (completer != null) {
+            ImageListener onImage = (ImageInfo image, bool synchronousCall) {
+              _onImage(image, obj, key);
+            };
+            ImageStreamListener listener = ImageStreamListener(onImage);
+            completer.addListener(listener);
+          }
         }
       }
     }
