@@ -1,6 +1,6 @@
 ## [4.0.0] - 2022/5/13
 
-* fix new compilation error in flutter 3.0.0
+* Flutter 3.0.0.
 
 ## [3.1.0] - 2021/12/29
 
