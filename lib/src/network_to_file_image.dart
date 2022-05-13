@@ -431,6 +431,12 @@ class _MockHttpClient implements HttpClient {
 
   @override
   Future<HttpClientRequest> putUrl(Uri url) => _realClient.putUrl(url);
+  
+  @override
+  set connectionFactory(Future<ConnectionTask<Socket>> Function(Uri url, String? proxyHost, int? proxyPort)? f)=> _realClient.connectionFactory=f;
+  
+  @override
+  set keyLog(Function(String line)? callback)=> _realClient.keyLog=callback;
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////
