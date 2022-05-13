@@ -174,7 +174,7 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
       // have had a chance to track the key in the cache at all.
       // Schedule a microtask to give the cache a chance to add the key.
       scheduleMicrotask(() {
-        PaintingBinding.instance!.imageCache!.evict(key);
+        PaintingBinding.instance.imageCache.evict(key);
       });
       rethrow;
     } finally {
@@ -431,6 +431,12 @@ class _MockHttpClient implements HttpClient {
 
   @override
   Future<HttpClientRequest> putUrl(Uri url) => _realClient.putUrl(url);
+  
+  @override
+  set connectionFactory(Future<ConnectionTask<Socket>> Function(Uri url, String? proxyHost, int? proxyPort)? f)=> _realClient.connectionFactory=f;
+  
+  @override
+  set keyLog(Function(String line)? callback)=> _realClient.keyLog=callback;
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////

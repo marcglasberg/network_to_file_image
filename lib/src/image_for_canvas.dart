@@ -69,12 +69,12 @@ class ImageForCanvas<T> {
           Future<ui.Codec> Function(Uint8List,
               {bool allowUpscaling, int? cacheHeight, int? cacheWidth}) decoder = (Uint8List bytes,
                   {bool? allowUpscaling, int? cacheWidth, int? cacheHeight}) =>
-              PaintingBinding.instance!
+              PaintingBinding.instance
                   .instantiateImageCodec(bytes, cacheWidth: cacheWidth, cacheHeight: cacheHeight);
 
           // When an exception is caught resolving an image, no completers are
           // cached and `null` is returned instead of a new completer.
-          final ImageStreamCompleter? completer = PaintingBinding.instance!.imageCache!.putIfAbsent(
+          final ImageStreamCompleter? completer = PaintingBinding.instance.imageCache.putIfAbsent(
             // ignore: invalid_use_of_protected_member
             imgProvider,
             // ignore: invalid_use_of_protected_member
