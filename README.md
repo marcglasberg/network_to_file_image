@@ -2,15 +2,15 @@
 
 # network_to_file_image
 
-This is a mixture of `FileImage` and `NetworkImage`. It will:
+This package combines `NetworkImage` and `FileImage` to:
 
-* Download the image from the **URL** once,
-* Save it locally in the **file system**,
-* And then use it from the file system in the future.
+* Download the image once from the URL,
+* Save it to the local file system,
+* Use the saved image from the file system from then on.
 
 <br>
 
-**In more detail:**
+### In more detail:
 
 Given a file and url of an image, it first tries to read it from the local file. It decodes the
 given `File` object as an image, associating it with the given scale.
@@ -19,10 +19,11 @@ However, if the image doesn't yet exist as a local file, it fetches the given UR
 associating it with the given scale, and then saves it to the local file. The image will be cached
 regardless of cache headers from the server.
 
-Notes:
+### Notes:
 
 - If the provided url is null or empty, `NetworkToFileImage` will default to `FileImage`. It will
   read the image from the local file, and won't try to download it from the network.
+            
 
 - If the provided file is null, `NetworkToFileImage` will default to `NetworkImage`. It will
   download the image from the network, and won't save it locally.
@@ -49,8 +50,9 @@ Then, create the image:
 Image(image: 
    NetworkToFileImage(
       url: "https://example.com/someFile.png", 
-      file: myFile)
+      file: myFile,
    )
+)
 ```
 
 If you make `debug: true` it prints to the console whether the image was read from the file or
@@ -61,8 +63,9 @@ Image(image:
    NetworkToFileImage(
       url: "https://example.com/someFile.png", 
       file: myFile, 
-      debug: true)
-   )    
+      debug: true,
+   )
+)    
 ```
 
 Try running
