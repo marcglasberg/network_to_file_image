@@ -1,9 +1,10 @@
 import 'dart:io';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'dart:ui' as ui;
 
 late Directory _appDocsDir;
 
@@ -14,8 +15,6 @@ void main() async {
 
   runApp(MaterialApp(home: Demo()));
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class User {
   final String? filename;
@@ -32,8 +31,6 @@ User user = User(
   url: "https://upload.wikimedia.org/wikipedia/commons/1/17/Google-flutter-logo.png",
 );
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class Demo extends StatefulWidget {
   @override
   _DemoState createState() => _DemoState();
@@ -44,22 +41,20 @@ class _DemoState extends State<Demo> {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(title: const Text('ImageForCanvas example')),
         body: Padding(
-          padding: const EdgeInsets.all(30.0),
+          padding: const EdgeInsets.all(2.0),
           child: CustomPaint(
             painter: MyPainter(user, loadCallback: (_, __, ___) {
               setState(() {});
             }),
             child: Container(
-              color: Colors.red.withOpacity(0.5),
-              width: 300,
-              height: 300,
+              color: Colors.red.withOpacity(0.35),
+              width: double.infinity,
+              height: 600,
             ),
           ),
         ),
       );
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class MyPainter extends CustomPainter {
   final User user;
@@ -92,14 +87,13 @@ class MyPainter extends CustomPainter {
 
   ImageForCanvas<User> _imageForCanvas() => ImageForCanvas<User>(
         //
-
         // Note: You can use any providers, like for example:
         // imageProviderSupplier: (User user) => NetworkImage(user.url),
         imageProviderSupplier: (User user) => NetworkToFileImage(
           file: fileFromDocsDir(user.filename),
           url: user.url,
+          debug: true,
         ),
-        //
 
         // The key should uniquely identify the image.
         keySupplier: (User user) => user.url!,
@@ -114,5 +108,3 @@ class MyPainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////

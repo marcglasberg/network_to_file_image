@@ -33,12 +33,49 @@ class _DemoState extends State<Demo> {
         appBar: AppBar(title: const Text('NetworkToFileImage example')),
         body: Padding(
           padding: const EdgeInsets.all(30.0),
-          child: Column(
-            children: [
-              _image(),
-              const SizedBox(height: 30),
-              _button(),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _image(),
+                const SizedBox(height: 30),
+                _button(),
+                SizedBox(height: 30),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('1. This prints debug messages to the console:'),
+                    SizedBox(height: 6),
+                    Text('NetworkToFileImage(... debug: true);', style: TextStyle(fontSize: 10)),
+                    SizedBox(height: 35),
+                    //
+                    Text('2. Rebuilding or hot-reloading should not read the image again, '
+                        'as the image is cached.'),
+                    SizedBox(height: 35),
+                    //
+                    Text('3. Restarting the app should, however, say something like:'),
+                    SizedBox(height: 6),
+                    Text('Reading image file: /data/user/0/xxx/app_flutter/flutter.png',
+                        style: TextStyle(fontSize: 10)),
+                    SizedBox(height: 35),
+                    //
+                    Text('4. Changing the filename here from:'),
+                    SizedBox(height: 6),
+                    Text('file: fileFromDocsDir("flutter.png")', style: TextStyle(fontSize: 10)),
+                    SizedBox(height: 12),
+                    Text('To:'),
+                    SizedBox(height: 6),
+                    Text('file: fileFromDocsDir("flutterX.png")', style: TextStyle(fontSize: 10)),
+                    SizedBox(height: 10),
+                    Text('And restarting the app, should print this to the console:'),
+                    SizedBox(height: 6),
+                    Text('Fetching image from: https://.../Google-flutter-logo.png',
+                        style: TextStyle(fontSize: 10)),
+                    Text('Saving image to file: /data/user/0/xxx/app_flutter/flutterX.png',
+                        style: TextStyle(fontSize: 10)),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -64,7 +101,7 @@ class _DemoState extends State<Demo> {
           count++;
         });
       },
-      child: Text('Rebuild image widget!'),
+      child: Text('Rebuild image widget'),
     );
   }
 }

@@ -3,8 +3,8 @@ library network_to_file_image;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui show Codec;
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -54,12 +54,20 @@ import 'package:flutter/material.dart';
 class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   //
   const NetworkToFileImage({
+    /// Same parameter as [FileImage].
     this.file,
+
+    /// Same parameter as [NetworkImage].
     this.url,
+
+    /// Same parameter as both [FileImage] and [NetworkImage].
     this.scale = 1.0,
+
+    /// Same parameter as [NetworkImage].
     this.headers,
+
+    /// If debug is true, print to the console if the image is from file or network.
     this.debug = false,
-    ProcessError? processError,
   }) : assert(file != null || url != null);
 
   final File? file;
@@ -110,7 +118,7 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   }
 
   @override
-  ImageStreamCompleter load(NetworkToFileImage key, DecoderCallback decode) {
+  ImageStreamCompleter loadImage(NetworkToFileImage key, ImageDecoderCallback decode) {
     // Ownership of this controller is handed off to [_loadAsync]; it is that
     // method's responsibility to close the controller's stream when the image
     // has been loaded or an error is thrown.
@@ -120,6 +128,7 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
         codec: _loadAsync(key, chunkEvents, decode),
         chunkEvents: chunkEvents.stream,
         scale: key.scale,
+        debugLabel: 'File: ${key.file?.path}, Url: ${key.url}',
         informationCollector: () {
           return <DiagnosticsNode>[
             ErrorDescription('Image provider: $this'),
@@ -132,7 +141,7 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   Future<ui.Codec> _loadAsync(
     NetworkToFileImage key,
     StreamController<ImageChunkEvent> chunkEvents,
-    DecoderCallback decode,
+    ImageDecoderCallback decode,
   ) async {
     try {
       assert(key == this);
@@ -161,13 +170,12 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
 
       // Reads from the network and saves it to the local file.
       else if (url != null && url.isNotEmpty) {
-        bytes = await _downloadFromTheNetworkAndSaveToTheLocalFile(chunkEvents, file, url);
+        bytes = await _downloadFromTheNetworkAndSaveToTheLocalFile(key, chunkEvents, file, url);
       }
 
       // ---
 
-      return decode(bytes);
-
+      return decode(await ImmutableBuffer.fromUint8List(bytes));
       //
     } catch (e) {
       // Depending on where the exception was thrown, the image cache may not
@@ -191,6 +199,7 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   }
 
   Future<Uint8List> _downloadFromTheNetworkAndSaveToTheLocalFile(
+    NetworkToFileImage key,
     StreamController<ImageChunkEvent> chunkEvents,
     File? file,
     String url,
@@ -281,15 +290,11 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
   }
 
   @override
-  int get hashCode => hashValues(file?.path, url, scale);
+  int get hashCode => Object.hash(file?.path, url, scale);
 
   @override
   String toString() => '$runtimeType("${file?.path}", "$url", scale: $scale)';
 }
-
-typedef ProcessError = void Function(dynamic error);
-
-// /////////////////////////////////////////////////////////////////////////////////////////////////
 
 class _MockHttpOverrides extends HttpOverrides {
   @override
@@ -297,8 +302,6 @@ class _MockHttpOverrides extends HttpOverrides {
     return _MockHttpClient(super.createHttpClient(context));
   }
 }
-
-// /////////////////////////////////////////////////////////////////////////////////////////////////
 
 class _MockHttpClient implements HttpClient {
   //
@@ -431,17 +434,17 @@ class _MockHttpClient implements HttpClient {
 
   @override
   Future<HttpClientRequest> putUrl(Uri url) => _realClient.putUrl(url);
-  
+
   @override
-  set connectionFactory(Future<ConnectionTask<Socket>> Function(Uri url, String? proxyHost, int? proxyPort)? f)=> _realClient.connectionFactory=f;
-  
+  set connectionFactory(
+          Future<ConnectionTask<Socket>> Function(Uri url, String? proxyHost, int? proxyPort)? f) =>
+      _realClient.connectionFactory = f;
+
   @override
-  set keyLog(Function(String line)? callback)=> _realClient.keyLog=callback;
+  set keyLog(Function(String line)? callback) => _realClient.keyLog = callback;
 }
 
-// /////////////////////////////////////////////////////////////////////////////////////////////////
-
-class _MockHttpClientRequest extends HttpClientRequest {
+class _MockHttpClientRequest implements HttpClientRequest {
   //
   final Uint8List? bytes;
 
@@ -452,6 +455,21 @@ class _MockHttpClientRequest extends HttpClientRequest {
 
   @override
   final HttpHeaders headers = _MockHttpHeaders();
+
+  @override
+  bool bufferOutput = true;
+
+  @override
+  int contentLength = -1;
+
+  @override
+  bool followRedirects = true;
+
+  @override
+  int maxRedirects = 5;
+
+  @override
+  bool persistentConnection = true;
 
   @override
   void add(List<int> data) {}
@@ -504,8 +522,6 @@ class _MockHttpClientRequest extends HttpClientRequest {
   void abort([Object? exception, StackTrace? stackTrace]) {}
 }
 
-// /////////////////////////////////////////////////////////////////////////////////////////////////
-
 class _MockHttpClientResponse implements HttpClientResponse {
   //
   final Stream<Uint8List> _delegate;
@@ -544,9 +560,18 @@ class _MockHttpClientResponse implements HttpClientResponse {
   bool get isRedirect => false;
 
   @override
-  StreamSubscription<Uint8List> listen(void Function(Uint8List event)? onData,
-      {Function? onError, void Function()? onDone, bool? cancelOnError}) {
-    return _delegate.listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+  StreamSubscription<Uint8List> listen(
+    void Function(Uint8List event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) {
+    return _delegate.listen(
+      onData,
+      onError: onError,
+      onDone: onDone,
+      cancelOnError: cancelOnError,
+    );
   }
 
   @override
@@ -761,10 +786,35 @@ class _MockHttpClientResponse implements HttpClientResponse {
   }
 }
 
-// /////////////////////////////////////////////////////////////////////////////////////////////////
-
-class _MockHttpHeaders extends HttpHeaders {
+class _MockHttpHeaders implements HttpHeaders {
   //
+  @override
+  late bool chunkedTransferEncoding;
+
+  @override
+  int contentLength = -1;
+
+  @override
+  ContentType? contentType;
+
+  @override
+  DateTime? date;
+
+  @override
+  DateTime? expires;
+
+  @override
+  String? host;
+
+  @override
+  DateTime? ifModifiedSince;
+
+  @override
+  late bool persistentConnection;
+
+  @override
+  int? port;
+
   @override
   List<String> operator [](String name) => <String>[];
 
@@ -792,5 +842,3 @@ class _MockHttpHeaders extends HttpHeaders {
   @override
   String? value(String name) => null;
 }
-
-// /////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
@@ -66,11 +66,13 @@ class ImageForCanvas<T> {
         if (imgProvider == null)
           return null;
         else {
-          Future<ui.Codec> Function(Uint8List,
-              {bool allowUpscaling, int? cacheHeight, int? cacheWidth}) decoder = (Uint8List bytes,
-                  {bool? allowUpscaling, int? cacheWidth, int? cacheHeight}) =>
-              PaintingBinding.instance
-                  .instantiateImageCodec(bytes, cacheWidth: cacheWidth, cacheHeight: cacheHeight);
+          ImageDecoderCallback decoder = (
+            ui.ImmutableBuffer buffer, {
+            ui.TargetImageSizeCallback? getTargetSize,
+          }) {
+            return PaintingBinding.instance
+                .instantiateImageCodecWithSize(buffer, getTargetSize: null);
+          };
 
           // When an exception is caught resolving an image, no completers are
           // cached and `null` is returned instead of a new completer.
@@ -78,7 +80,7 @@ class ImageForCanvas<T> {
             // ignore: invalid_use_of_protected_member
             imgProvider,
             // ignore: invalid_use_of_protected_member
-            () => imgProvider.load(imgProvider, decoder),
+            () => imgProvider.loadImage(imgProvider, decoder),
             onError: null,
           )!;
 
