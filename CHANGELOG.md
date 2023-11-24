@@ -1,3 +1,7 @@
+## [5.0.3] - 2022/11/24
+
+* Fixed catch-all problem.
+
 ## [5.0.2] - 2022/11/16
 
 * Flutter 3.16.0 compatible.

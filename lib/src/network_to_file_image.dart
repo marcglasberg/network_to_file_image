@@ -173,6 +173,11 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
         bytes = await _downloadFromTheNetworkAndSaveToTheLocalFile(key, chunkEvents, file, url);
       }
 
+      // Catch-all.
+      else {
+        bytes = Uint8List(0);
+      }
+
       // ---
 
       return decode(await ImmutableBuffer.fromUint8List(bytes));
