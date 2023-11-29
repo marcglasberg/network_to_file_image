@@ -89,7 +89,7 @@ class _DemoState extends State<Demo> {
         debug: true,
       ),
       errorBuilder: (context, error, stackTrace) {
-        return Text('Download image failed.');
+        return Center(child: Text('Download image failed: $error.', textAlign: TextAlign.center));
       },
     );
   }

@@ -173,23 +173,27 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
         bytes = await _downloadFromTheNetworkAndSaveToTheLocalFile(key, chunkEvents, file, url);
       }
 
-      // Catch-all.
+      // This is executed when:
+      // - Both the url and the file are null. Or,
+      // - The file doesn't exist locally, but the url was not provided.
       else {
-        bytes = Uint8List(0);
+        final Uri? uri = (url == null) ? null : Uri.base.resolve(url);
+        throw NetworkToFileImageLoadException(file: file, uri: uri, statusCode: 0);
       }
 
       // ---
 
       return decode(await ImmutableBuffer.fromUint8List(bytes));
       //
-    } catch (e) {
-      // Depending on where the exception was thrown, the image cache may not
-      // have had a chance to track the key in the cache at all.
-      // Schedule a microtask to give the cache a chance to add the key.
+    } catch (error) {
+      // Depending on where the exception was thrown, the image cache may not have had a chance to
+      // track the key in the cache. Schedule a microtask to give the cache a chance to add the key.
       scheduleMicrotask(() {
         PaintingBinding.instance.imageCache.evict(key);
       });
+
       rethrow;
+      //
     } finally {
       chunkEvents.close();
     }
@@ -223,11 +227,16 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
     final HttpClientResponse response = await request.close();
     if (response.statusCode != HttpStatus.ok) {
       if (debug) print("Failed fetching image from: $url");
+
       // The network may be only temporarily unavailable, or the file will be
       // added on the server later. Avoid having future calls to resolve
       // fail to check the network again.
       await response.drain<List<int>?>();
-      throw NetworkImageLoadException(statusCode: response.statusCode, uri: resolved);
+      throw NetworkToFileImageLoadException(
+        file: file,
+        uri: resolved,
+        statusCode: response.statusCode,
+      );
     }
 
     final Uint8List bytes = await consolidateHttpClientResponseBytes(
@@ -846,4 +855,30 @@ class _MockHttpHeaders implements HttpHeaders {
 
   @override
   String? value(String name) => null;
+}
+
+class NetworkToFileImageLoadException implements Exception {
+  /// Creates a [NetworkImageLoadException] with the specified http [statusCode],
+  /// [uri] and [file].
+  NetworkToFileImageLoadException({
+    required this.statusCode,
+    required this.uri,
+    required this.file,
+  }) : _message = 'Image load failed: file: ${file?.path}, URL: $uri'
+            '${statusCode != 0 ? ", statusCode: $statusCode." : ""}.';
+
+  /// The HTTP status code from the server.
+  final int statusCode;
+
+  /// A human-readable error message.
+  final String _message;
+
+  /// Resolved URL of the requested image.
+  final Uri? uri;
+
+  /// File of the requested image.
+  final File? file;
+
+  @override
+  String toString() => _message;
 }

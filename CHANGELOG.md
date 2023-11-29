@@ -1,6 +1,10 @@
-## [5.0.3] - 2022/11/24
+## [6.0.0] - 2022/11/24
 
-* Fixed catch-all problem.
+* Breaking change: Loading errors are now `NetworkToFileImageLoadException` instead
+  of `NetworkImageLoadException`. This change is unlikely to affect you.
+
+* Better error handling when both the url and the file are null, or when the file doesn't exist
+  locally, but the url was not provided.
 
 ## [5.0.2] - 2022/11/16
 
