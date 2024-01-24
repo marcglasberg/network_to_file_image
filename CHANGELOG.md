@@ -1,4 +1,4 @@
-## [6.0.0] - 2022/11/24
+## [6.0.1] - 2022/11/24
 
 * Breaking change: Loading errors are now `NetworkToFileImageLoadException` instead
   of `NetworkImageLoadException`. This change is unlikely to affect you.
