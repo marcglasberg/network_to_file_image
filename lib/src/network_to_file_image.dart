@@ -183,7 +183,7 @@ class NetworkToFileImage extends ImageProvider<NetworkToFileImage> {
 
       // ---
 
-      return decode(await ImmutableBuffer.fromUint8List(bytes));
+      return await decode(await ImmutableBuffer.fromUint8List(bytes));
       //
     } catch (error) {
       // Depending on where the exception was thrown, the image cache may not have had a chance to

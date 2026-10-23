@@ -32,8 +32,10 @@ User user = User(
 );
 
 class Demo extends StatefulWidget {
+  const Demo({super.key});
+
   @override
-  _DemoState createState() => _DemoState();
+  State<Demo> createState() => _DemoState();
 }
 
 class _DemoState extends State<Demo> {
@@ -43,11 +45,11 @@ class _DemoState extends State<Demo> {
         body: Padding(
           padding: const EdgeInsets.all(2.0),
           child: CustomPaint(
-            painter: MyPainter(user, loadCallback: (_, __, ___) {
+            painter: MyPainter(user, loadCallback: (_, _, _) {
               setState(() {});
             }),
             child: Container(
-              color: Colors.red.withOpacity(0.35),
+              color: Colors.red.withValues(alpha: 0.35),
               width: double.infinity,
               height: 600,
             ),

@@ -21,6 +21,8 @@ File fileFromDocsDir(String filename) {
 }
 
 class Demo extends StatefulWidget {
+  const Demo({super.key});
+
   @override
   State<Demo> createState() => _DemoState();
 }
