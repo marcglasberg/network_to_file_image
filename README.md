@@ -1,4 +1,4 @@
-[![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
+[![](./example/SponsoredByMyTextAi.jpg)](https://mytext.ai)
 
 [![pub package](https://img.shields.io/pub/v/network_to_file_image.svg)](https://pub.dartlang.org/packages/network_to_file_image)
 
