@@ -1,3 +1,7 @@
+## 7.0.2
+
+* Use Flutter painting and foundation APIs without importing the deprecated Material library. Image loading and disk-cache behavior are unchanged.
+
 ## 7.0.1
 
 * Sponsored by [MyText.ai](https://mytext.ai)

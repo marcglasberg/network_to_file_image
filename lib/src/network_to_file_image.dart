@@ -7,7 +7,7 @@ import 'dart:ui' as ui show Codec;
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 
 /// This is a mixture of [FileImage] and [NetworkImage].
 /// It will download the image from the url once, save it locally in the file system,

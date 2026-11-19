@@ -4,10 +4,11 @@ version: 1.0.0+1
 publish_to: none
 
 environment:
-  sdk: '>=3.8.0 <4.0.0'
-  flutter: ">=3.32.0"
+  sdk: '>=3.13.0 <4.0.0'
+  flutter: ">=3.47.0"
 
 dependencies:
+  material_ui: ^1.11.1
   path: ^1.9.0
   path_provider: ^2.1.5
   network_to_file_image:

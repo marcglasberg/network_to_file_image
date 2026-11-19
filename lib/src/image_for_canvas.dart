@@ -1,6 +1,5 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
 typedef LoadCallback<T> = void Function(ImageInfo image, T obj, Object? key);
